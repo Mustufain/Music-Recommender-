@@ -17,21 +17,26 @@ def get_friends(user, data):
 
 def get_friends_of_friend(friends, data):
     """Find friends of friends for a given user"""
-    friends_of_friends = {}
+    friends_of_friends = []
     for friend in friends:
         friend_list = list(
             data.loc[data.user == friend].user_friend_list.values)
-        friends_of_friends[friend] = friend_list
-    return friends_of_friends
+        friends_of_friends.append(friend_list)
+    return sum(friends_of_friends, [])
 
 
-def get_common_friends(friends, friends_of_friends):
+def get_common_friends(user, friends, friends_of_friends, data):
     """Get common friends between a user and friends of friends"""
     common_friends_list = []
     friends_set = set(friends)
-    for key, value in friends_of_friends.items():
-        result = (key, len(list(friends_set.intersection(value))))
-        common_friends_list.append(result)
+    for friend_of_friend in list(set(friends_of_friends)):
+        if int(friend_of_friend) != user and friend_of_friend not in friends:
+            friend_of_friend_list = list(
+                data.loc[data.user ==
+                         friend_of_friend].user_friend_list.values)
+            result = (friend_of_friend, len(list(
+                friends_set.intersection(friend_of_friend_list))))
+            common_friends_list.append(result)
     return common_friends_list
 
 
@@ -53,9 +58,13 @@ if __name__ == "__main__":
     for user in user_list:
         friends = get_friends(user, data)
         friends_of_friends = get_friends_of_friend(friends, data)
-        common_friends_list = get_common_friends(friends, friends_of_friends)
+        common_friends_list = get_common_friends(user,
+                                                 friends,
+                                                 friends_of_friends,
+                                                 data)
         recommendation = get_top_4_friends(common_friends_list)
         print ("Top 4 Friends suggested to user " +
                str(user) +
                " are " +
                str(recommendation))
+        break
