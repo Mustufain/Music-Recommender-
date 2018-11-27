@@ -27,28 +27,30 @@ def get_friends_of_friend(friends, data):
 
 def get_common_friends(user, friends, friends_of_friends, data):
     """Get common friends between a user and friends of friends"""
-    common_friends_list = []
+    common_friends_list = {}
     friends_set = set(friends)
     for friend_of_friend in list(set(friends_of_friends)):
         if int(friend_of_friend) != user and friend_of_friend not in friends:
             friend_of_friend_list = list(
                 data.loc[data.user ==
                          friend_of_friend].user_friend_list.values)
-            result = (friend_of_friend, len(list(
-                friends_set.intersection(friend_of_friend_list))))
-            common_friends_list.append(result)
+            score = len(list(friends_set.intersection(friend_of_friend_list)))
+            if score in common_friends_list:
+                common_friends_list[score].append(friend_of_friend)
+            else:
+                common_friends_list[score] = [friend_of_friend]
     return common_friends_list
 
 
-def get_top_4_friends(common_friends_list):
+def get_top_friends(common_friends_list):
     """Get top 4 friends for a given user"""
-    sorted_common_friends_list = sorted(common_friends_list,
-                                        key=lambda tup: tup[1], reverse=True)
-    top_4 = sorted_common_friends_list[:4]
-    top_4_users = []
-    for user in top_4:
-        top_4_users.append(user[0])
-    return top_4_users
+    n = 4
+    top_n_users = []
+    top_scores = sorted(common_friends_list, reverse=True)
+    for score in top_scores:
+            top_n_users.append(sorted(common_friends_list[score]))
+    top_n_users = sum(top_n_users, [])
+    return top_n_users[:n]
 
 
 if __name__ == "__main__":
@@ -62,9 +64,8 @@ if __name__ == "__main__":
                                                  friends,
                                                  friends_of_friends,
                                                  data)
-        recommendation = get_top_4_friends(common_friends_list)
+        recommendation = get_top_friends(common_friends_list)
         print ("Top 4 Friends suggested to user " +
                str(user) +
                " are " +
                str(recommendation))
-        break
