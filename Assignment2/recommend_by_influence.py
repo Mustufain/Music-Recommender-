@@ -12,6 +12,7 @@ def get_friends(user, data):
     """get friends for a given user"""
     friends = list(
         data.loc[data.user == user].user_friend_list.values)
+    print (friends)
     return friends
 
 

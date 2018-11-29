@@ -3,8 +3,6 @@ import numpy as np
 from sklearn.metrics.pairwise import pairwise_distances
 # https://towardsdatascience.com/how-to-build-a-simple-song-recommender-296fcbc8c85
 # https://www.analyticsvidhya.com/blog/2018/06/comprehensive-guide-recommendation-engine-python/
-"""You will be asked to predict the chances of a user listening """
-"""to a song repetitively after the first observable listening event within a time window was triggered"""
 
 
 class MusicRecommender(object):
