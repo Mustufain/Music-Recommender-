@@ -22,31 +22,24 @@ class PopulairtyRecommender(object):
 
     def __init__(self):
         self.train_data = None
-        self.user_id = None
-        self.item_id = None
         self.popularity_recommendations = None
 
     # Create the popularity based recommender system model
-    def create(self, train_data, user_id, item_id):
+    def create(self, train_data):
         self.train_data = train_data
-        self.user_id = user_id
-        self.item_id = item_id
 
         # Get a count of user_ids for each unique song as recommendation score
-        train_data_grouped = train_data.groupby([self.item_id]).agg(
-            {self.user_id: 'count'}).reset_index()
-        train_data_grouped.rename(columns={
-            'user_id': 'score'}, inplace=True)
+        train_data_grouped = train_data.groupby(
+            'song')['user_id'].count().reset_index()
+        train_data_grouped.columns = ['song', 'score']
         # Sort the songs based upon recommendation score
         train_data_sort = train_data_grouped.sort_values(
-            ['score', self.item_id], ascending=[0, 1])
+            ['score', 'song'], ascending=[0, 1])
         # Generate a recommendation rank based upon score
         train_data_sort['Rank'] = train_data_sort['score'].rank(
             ascending=0, method='first')
         # Get the top 10 recommendations
         self.popularity_recommendations = train_data_sort.head(10)
-        # Use the popularity based recommender system model to
-        # make recommendations
 
     def recommend(self, user_id):
         user_recommendations = self.popularity_recommendations
@@ -61,14 +54,15 @@ class PopulairtyRecommender(object):
 
 if __name__ == '__main__':
 
-    songs = pd.read_csv('data/songs.csv')
-    song_df = songs.head(10000)
+    song_df = pd.read_csv('data/songs.csv')
     users = song_df['user_id'].unique()
     train_data, test_data = train_test_split(
         song_df, test_size=0.20, random_state=0)
-    pm = PopulairtyRecommender()
-    pm.create(train_data, 'user_id', 'song')
+    pr = PopulairtyRecommender()
+    pr.create(train_data)
     # user the popularity model to make some prediction
-    user_id = users[5]
-    user_recommendations = pm.recommend(user_id)
+    user_id = users[10]
+    user_recommendations = pr.recommend(user_id)
+    print ("----------Recommending top 10 songs for user_id " + str(
+        user_id) + "----------")
     print (user_recommendations['song'])

@@ -24,6 +24,9 @@ class MusicRecommender(object):
             lambda row: str(row['title']) + " - " + str(row['artist_name']),
             axis=1)
 
+    def popularity_based_recommendation(self):
+        return
+
     def get_unique_users(self):
         users = self.target.user_id.unique()
         return users
