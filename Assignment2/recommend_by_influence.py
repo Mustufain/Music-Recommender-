@@ -10,8 +10,12 @@ def read_data(file):
 
 def get_friends(user, data):
     """get friends for a given user"""
-    friends = list(
+    setA = list(
         data.loc[data.user == user].user_friend_list.values)
+    setB = list(
+        data.loc[data.user_friend_list == user].user
+        .values)
+    friends = list(set(set(setA).union(setB)))
     return friends
 
 
@@ -19,8 +23,7 @@ def get_friends_of_friend(friends, data):
     """Find friends of friends for a given user"""
     friends_of_friends = []
     for friend in friends:
-        friend_list = list(
-            data.loc[data.user == friend].user_friend_list.values)
+        friend_list = get_friends(friend, data)
         friends_of_friends.append(friend_list)
     return sum(friends_of_friends, [])
 
@@ -31,9 +34,7 @@ def get_common_friends(user, friends, friends_of_friends, data):
     friends_set = set(friends) # user friends
     for friend_of_friend in list(set(friends_of_friends)):
         if int(friend_of_friend) != user and friend_of_friend not in friends:
-            friend_of_friend_list = list(
-                data.loc[data.user ==
-                         friend_of_friend].user_friend_list.values)
+            friend_of_friend_list = get_friends(friend_of_friend, data)
             common_friends = list(
                 friends_set.intersection(friend_of_friend_list))
             if friend_of_friend in common_friends_list:
@@ -49,14 +50,9 @@ def get_influence_score(common_friends_list, data):
     for friend_of_friend, common_friends in common_friends_list.items():
         score_list = []
         for common_friend in common_friends:
-            try:
-                # some common friend have no friend :(
-                no_of_friends_score = 1/len(list(
-                    data.loc[data.user == common_friend].user_friend_list.values))
-                score_list.append(no_of_friends_score)
-            except Exception as e:
-                # if there are no friends (it is interpreted as zero)
-                score_list.append(0)
+            friends = get_friends(common_friend, data)
+            no_of_friends_score = 1/len(friends)
+            score_list.append(no_of_friends_score)
         influence_score = sum(score_list)
         if influence_score in influence_score_list:
             influence_score_list[influence_score].append(friend_of_friend)
@@ -70,7 +66,6 @@ def get_top_friends(influence_score_list):
     n = 4
     top_n_users = []
     top_scores = sorted(influence_score_list, reverse=True)
-    print (top_scores)
     for score in top_scores:
             top_n_users.append(sorted(influence_score_list[score]))
     top_n_users = sum(top_n_users, [])
@@ -94,3 +89,4 @@ if __name__ == "__main__":
                str(user) +
                " are " +
                str(recommendation))
+        

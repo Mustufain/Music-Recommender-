@@ -10,8 +10,12 @@ def read_data(file):
 
 def get_friends(user, data):
     """get friends for a given user"""
-    friends = list(
+    setA = list(
         data.loc[data.user == user].user_friend_list.values)
+    setB = list(
+        data.loc[data.user_friend_list == user].user
+        .values)
+    friends = list(set(set(setA).union(setB)))
     return friends
 
 
@@ -19,8 +23,7 @@ def get_friends_of_friend(friends, data):
     """Find friends of friends for a given user"""
     friends_of_friends = []
     for friend in friends:
-        friend_list = list(
-            data.loc[data.user == friend].user_friend_list.values)
+        friend_list = get_friends(friend, data)
         friends_of_friends.append(friend_list)
     return sum(friends_of_friends, [])
 
@@ -31,9 +34,7 @@ def get_common_friends(user, friends, friends_of_friends, data):
     friends_set = set(friends)
     for friend_of_friend in list(set(friends_of_friends)):
         if int(friend_of_friend) != user and friend_of_friend not in friends:
-            friend_of_friend_list = list(
-                data.loc[data.user ==
-                         friend_of_friend].user_friend_list.values)
+            friend_of_friend_list = get_friends(friend_of_friend, data)
             score = len(list(friends_set.intersection(friend_of_friend_list)))
             if score in common_friends_list:
                 common_friends_list[score].append(friend_of_friend)
