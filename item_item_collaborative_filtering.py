@@ -49,11 +49,6 @@ class MusicRecommender(object):
                        i for i in range(0, len(unique_songs))}
         return song_lookup
 
-    def get_user_similarity(self, data_matrix):
-        # similarities are obtained by subtracting distances from 1
-        user_similarity = 1 - pairwise_distances(data_matrix, metric='cosine')
-        return user_similarity
-
     def get_item_similarity(self, data_matrix):
         item_similarity = pairwise_distances(data_matrix.T, metric='cosine')
         return item_similarity
@@ -66,15 +61,6 @@ class MusicRecommender(object):
         for line in self.target.itertuples():
             data_matrix[user_lookup[line[1]], song_lookup[line[2]]] = line[3]
         self.datamatrix = data_matrix
-
-    def predict_user(self, data_matrix):
-        user_similarity = self.get_user_similarity(data_matrix)
-        mean_user_target = data_matrix.mean(axis=1)
-        target_diff = (data_matrix - mean_user_target[:, np.newaxis])
-        pred = mean_user_target[:, np.newaxis]
-        + user_similarity.dot(target_diff) / np.array(
-            [np.abs(user_similarity).sum(axis=1)]).T
-        return pred
 
     def predict_item(self, data_matrix):
         item_similarity = self.get_item_similarity(data_matrix)
