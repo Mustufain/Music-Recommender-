@@ -1,33 +1,5 @@
 import pandas as pd
 
-"""
-Information about data:
-Songs data source = 'https://static.turi.com/datasets/millionsong/10000.txt'
-Meta data data source = 'https://static.turi.com/datasets/millionsong/song_data.csv'
-Total 2000000 songs
-First 10000 songs are selected
-Unique users = 365
-Unique songs = 5151
-Users has listened to more than one song (multiple entries for each user) in
-songs subset of 10000 songs
-
-Note : These are not personalized recommendations. For every user,
-recommendation will be same as it recommends top 10 trending songs.
-
-Recommendation for user[10]:
-
-7127                             Sehr kosmisch - Harmonia
-9084                                         Undo - Björk
-2068    Dog Days Are Over (Radio Edit) - Florence + Th...
-9880                       You're The One - Dwight Yoakam
-6774                              Revelry - Kings Of Leon
-7115                                Secrets - OneRepublic
-3613    Horn Concerto No. 4 in E flat K495: II. Romanc...
-2717                       Fireflies - Charttraxx Karaoke
-3485                             Hey_ Soul Sister - Train
-8847                                   Tive Sim - Cartola
-"""
-
 
 class PopulairtyRecommender(object):
     """Recommending most popular/trending songs"""
@@ -75,7 +47,7 @@ if __name__ == '__main__':
         lambda row: str(row['title']) + " - " + str(row['artist_name']),
         axis=1)
     users = song_df['user_id'].unique()
-    user_id = users[10]
+    user_id = 'b80344d063b5ccb3212f76538f3d9e43d87dca9e'
     pr = PopulairtyRecommender()
     pr.create(song_df)
     pr.fit()

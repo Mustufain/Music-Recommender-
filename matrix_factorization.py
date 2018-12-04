@@ -46,6 +46,9 @@ class MatrixFactorization(object):
         self.P = U
         self. W = S
         self.Q = Vt
+        print (self.P.shape)
+        print (self.W.shape)
+        print (self.Q.shape)
 
     def computeSVD(self, urm, K):
         smat = csc_matrix(urm)
@@ -83,15 +86,3 @@ if __name__ == '__main__':
     mf.create(song_df)
     mf.fit()
     mf.recommend(user_id_index)
-
-
-#     esson Learned - Alicia Keys featuring John Mayer
-# Le Courage Des Oiseaux - Dominique A
-# Sugar Ray (LP Version) - Todd Barry
-# Trigger Hippie - Morcheeba
-# Only In Dreams - Weezer
-# Paper Planes - M.I.A.
-# Tomorrow's World feat. Lacks - Harvey Lindo
-# Do You Really Want To Hurt Me - Culture Club
-# Six Feet Up - Octopus Project
-# Mi primer millon - Bacilos

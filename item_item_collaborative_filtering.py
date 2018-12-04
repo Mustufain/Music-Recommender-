@@ -2,22 +2,6 @@ import pandas as pd
 import numpy as np
 from sklearn.metrics.pairwise import pairwise_distances
 
-""""
-Personalized Recommendations for every user.
-Recommendations for user[10]:
-
-4074                              Be With You - Beyoncé
-1426                  Relax - Frankie Goes To Hollywood
-2234                            Home - Three Days Grace
-1270                      Paradise City - Guns N' Roses
-878       The Only Exception (Album Version) - Paramore
-4069    Check On It - Beyoncé feat. Bun B and Slim Thug
-661                   What They Found - Octopus Project
-209                                Wet Blanket - Metric
-3735             Oxford Comma (Album) - Vampire Weekend
-388      Hippie Priest Bum-out (Edit) - LCD Soundsystem
-"""
-
 
 class MusicRecommender(object):
     """Item - Item based collaborative filtering."""
@@ -66,6 +50,7 @@ class MusicRecommender(object):
         item_similarity = self.get_item_similarity(data_matrix)
         pred = data_matrix.dot(item_similarity) / np.array(
             [np.abs(item_similarity).sum(axis=1)])
+        print (pred.shape)
         return pred
 
     def recommend(self, user_id):
@@ -88,7 +73,7 @@ if __name__ == '__main__':
         lambda row: str(row['title']) + " - " + str(row['artist_name']),
         axis=1)
     users = song_df['user_id'].unique()
-    user_id = users[10]
+    user_id = 'b80344d063b5ccb3212f76538f3d9e43d87dca9e'
     music = MusicRecommender()
     music.create(song_df)
     music.fit()
