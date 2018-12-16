@@ -1,6 +1,8 @@
 import pandas as pd
 import numpy as np
 from sklearn.metrics.pairwise import pairwise_distances
+import time
+from sklearn.metrics import mean_squared_error
 
 
 class MusicRecommender(object):
@@ -34,10 +36,17 @@ class MusicRecommender(object):
         return song_lookup
 
     def get_item_similarity(self, data_matrix):
-        item_similarity = pairwise_distances(data_matrix.T, metric='cosine')
+        """Create item item similarity matrix of shape (songs, songs)
+         based of cosine similarity."""
+        item_similarity = pairwise_distances(data_matrix.T,
+                                             metric='cosine',
+                                             n_jobs=-1)
         return item_similarity
 
     def fit(self):
+        """Creates a data matrix with shape (users, songs). The value of each
+        cell of the datamatix is how many times user has listened that song.
+        """
         data_matrix = np.zeros((len(self.get_unique_users()),
                                 len(self.get_unique_songs())))
         user_lookup = self.user_lookup()
@@ -50,7 +59,6 @@ class MusicRecommender(object):
         item_similarity = self.get_item_similarity(data_matrix)
         pred = data_matrix.dot(item_similarity) / np.array(
             [np.abs(item_similarity).sum(axis=1)])
-        print (pred.shape)
         return pred
 
     def recommend(self, user_id):
@@ -64,10 +72,18 @@ class MusicRecommender(object):
         print ("----------Recommending top 10 songs for user_id " + str(
             user_id) + "----------")
         print (self.target.loc[top_10_songs_list]['song_name'])
+        return self.evaluate_model(pred)
+
+    def evaluate_model(self, pred):
+        """Evaluate item item based collaborative filtering model"""
+        error = []
+        for i in range(0, self.datamatrix.shape[0]):
+            error.append(mean_squared_error(self.datamatrix[i],  pred[i]))
+        return round(np.mean(error), 4)
 
 
 if __name__ == '__main__':
-
+    start_time = time.time()
     song_df = pd.read_csv('data/songs.csv')
     song_df['song_name'] = song_df.apply(
         lambda row: str(row['title']) + " - " + str(row['artist_name']),
@@ -77,4 +93,6 @@ if __name__ == '__main__':
     music = MusicRecommender()
     music.create(song_df)
     music.fit()
-    music.recommend(user_id)
+    mse = music.recommend(user_id)
+    print ('Mean Squared Error: ' + str(mse))
+    print("--- %s seconds ---" % (time.time() - start_time))
